@@ -1,0 +1,2 @@
+# MT-inversion
+To start, MT literature will be given to you, and you will have the opportunity learn about the MT method. The next step will then be to create synthetic 1D MT data and work with them using a MATLAB forward modeling function. After that, you will study real MT data. Based on your reading, you will study the dimensionality of the data provided and determine whether a 1D assumption is reasonable. Then you will contribute to writing a 1D inversion code in order to estimate the electrical conductivity distribution from MT measurements.
