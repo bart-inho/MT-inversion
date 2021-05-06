@@ -12,19 +12,19 @@ function [C,rho_a,phi] = Wait_recursion(omega,z,sigma,mu_0)
 % - phi: impedance phase [deg]
 
 % Inverse transfer function initialization
-q = zeros(size(z,1),size(omega,2)); % [m] inverse homogeneous half-space model transfer function 
-q(end,:) = sqrt(1i*mu_0.*sigma(end).*omega);
+q = zeros(size(omega)); % [m] inverse homogeneous half-space model transfer function 
+q(:) = sqrt(1i*mu_0.*sigma(end).*omega);
 
 % Transfer function initialization
 C = zeros(size(q));
-C(end,:) = 1./q(end,:);
+C(:) = 1./q(:);
 
 % Wait's recursion algorithm
 for n=length(z):2
-    q(n,:) = sqrt(1i*mu_0*sigma(n)*omega);
+    q(:) = sqrt(1i*mu_0*sigma(n)*omega);
     % Wait's recursion formula
-    C(n-1,:) = (              q(n,:).*C(n,:) + tanh( q(n,:)*(z(n)-z(n-1))    )) / ...
-               ( q(n,:) * (1+(q(n,:).*C(n,:) * tanh( q(n,:)*(z(n)-z(n-1)) )) ));
+    C(:) = (              q(:).*C(:) + tanh( q(:)*(z(n)-z(n-1))    )) / ...
+           (   q(:) * (1+(q(:).*C(:) * tanh( q(:)*(z(n)-z(n-1)) )) ));
 end
 
 % Apparent resistivity
@@ -33,3 +33,7 @@ rho_a = norm(C)^2*mu_0*omega;
 
 % Impedance phase
 phi = atand(imag(C)./real(C)) + 90; % [deg]
+
+
+
+
