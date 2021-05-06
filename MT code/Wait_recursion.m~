@@ -1,0 +1,37 @@
+function [C,rho_a] = Wait_recursion(omega,z,sigma,mu_0)
+% Wait's recursion formula (2.33) from (Simpson & Bahr, 2005)
+%
+% Inputs:
+% - omega: angular frequency [Hz]
+% - z: depth of bottom interface [m]
+% - sigma: electrical conductivity [S/m]
+%
+% Outputs:
+% - C: Schmucker-Weidelt transfer function (Weidelt, 1972; Schmucker, 1973)
+% - rho_a: apparent resistivity [Ohm.m]
+
+% Inverse transfer function
+q = zeros(size(z,1),size(omega,2)); % [m] inverse homogeneous half-space model transfer function 
+q(end,:) = sqrt(1i*mu_0.*sigma(end).*omega);
+
+% Transfer function
+C = zeros(size(q));
+C(end,:) = 1./q(end,:);
+for n=length(z):2
+    q(n,:) = sqrt(1i*mu_0*sigma(n)*omega);
+    % Wait's recursion formula
+    C(n-1,:) = (              q(n,:)*C(n,:) + tanh( q(n,:)*(z(n)-z(n-1))    )) / ...
+               ( q(n,:) * (1+(q(n,:)*C(n,:) * tanh( q(n,:)*(z(n)-z(n-1)) )) ));
+end
+
+% Apparent resistivity
+rho_a = (real(C).^2+imag(C).^2)*mu_0*omega;
+
+% 
+
+
+
+% dim(C)=(5x36)
+% dim(omega) = (1x36)
+% dim(C*omega) = (5x36)*(1x36)
+% 5x36 36x1
