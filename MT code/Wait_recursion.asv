@@ -16,23 +16,23 @@ q = zeros(size(omega)); % [m] inverse homogeneous half-space model transfer func
 q(:) = sqrt(1i*mu_0*sigma(end)*omega);
 
 % Transfer function initialization
-C = zeros(size(omega));
-C(:) = 1./q(:);
+C = zeros(size(q));
+C(:) = q(:)1;
 
 % Wait's recursion algorithm
-for n=length(z):-1:2
-    q = sqrt(1i*mu_0*sigma(n).*omega);
+for n=length(z):2
+    q(:) = sqrt(1i*mu_0*sigma(n)*omega);
     % Wait's recursion formula
-    C = (      q.*C + tanh(q.*(z(n)-z(n-1)))  ) ./ ...
-        (q.*(1+(q.*C .* tanh(q.*(z(n)-z(n-1))))));
+    C(:) = (              q(:)*C(:) + tanh( q(:)*(z(n)-z(n-1))    )) / ...
+           (   q(:) * (1+(q(:)*C(:) * tanh( q(:)*(z(n)-z(n-1)) )) ));
 end
 
 % Apparent resistivity
-rho_a = sqrt(real(C).^2+imag(C).^2)*mu_0.*omega; % [Ohm.m]
+rho_a = sqrt(real(C).^2+imag(C).^2)./(mu_0.*omega); % [Ohm.m]
 % rho_a = norm(C)^2*mu_0*omega;
 
 % Impedance phase
-phi = atand(imag(C)/real(C)) + 90; % [deg]
+phi = atand(imag(C)./real(C)) + 90; % [deg]
 
 
 
