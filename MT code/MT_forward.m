@@ -1,6 +1,7 @@
 % Magnetotelluric (MT) forward model
+% N-layered half-space
 
-clear, close
+clear
 
 % Parameters
 load freq.mat;
@@ -14,7 +15,7 @@ fs = 13; % Fontsize
 % Variables
 mu_0 = 4*pi*1e-7; % [H/m] magnetic permeability of free space
 
-[C] = Wait_recursion(omega,z,sigma,mu_0); % C-response [1/m]
+[C] = Wait_recursion(omega,z,sigma,mu_0); % C-response [m]
 rho_a = (real(C).^2+imag(C).^2)*mu_0.*omega; % Apparent resistivity [Ohm.m]
 phi = atand(imag(C)/real(C)) + 90; % Impedance phase [deg]
 
@@ -28,7 +29,6 @@ grid on
 xlabel('Period T [s]','FontSize',fs)
 ylabel('Apparent resistivity \rho_a [\Omega\cdotm]','FontSize',fs)
 title('MT forward model with synthetic datas','FontSize',fs)
-
 
 
 

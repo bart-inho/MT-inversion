@@ -13,8 +13,8 @@ function [C] = Wait_recursion(omega,z,sigma,mu_0)
 
 
 % Initialization
-q = sqrt(1i*mu_0*sigma(end)*omega); % [m] inverse homogeneous half-space model transfer function 
-C = 1./q; % Transfer function
+q = sqrt(1i*mu_0*sigma(end)*omega); % [1/m] Inverse homogeneous half-space model transfer function 
+C = 1./q; % Transfer function 
 
 % Wait's recursion algorithm
 for n=length(z):-1:2
