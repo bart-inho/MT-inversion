@@ -17,11 +17,11 @@ q = sqrt(1i*mu_0*sigma(end)*omega); % [1/m] Inverse homogeneous half-space model
 C = 1./q; % Transfer function 
 
 % Wait's recursion algorithm
-for n=length(z):-1:2
+for n=length(z)-1:-1:1
     q = sqrt(1i*mu_0*sigma(n).*omega);
     % Wait's recursion formula
-    C = (       q.*C  + tanh(q.*(z(n)-z(n-1)))  ) ./ ...
-        (q.*(1+(q.*C .* tanh(q.*(z(n)-z(n-1))))));
+    C = (       q.*C  + tanh(q.*(z(n+1)-z(n)))  ) ./ ...
+        (q.*(1+(q.*C .* tanh(q.*(z(n+1)-z(n))))));
 end
 
 

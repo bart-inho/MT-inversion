@@ -8,15 +8,15 @@ load freq.mat;
 freq = freq'; % [Hz] frequency of signal
 T = 1./freq; % [s] period of signal
 omega = 2*pi*freq; % [Hz] angular frequency of signal
-z = [0 200 400 1000]'; % [m] depths
-sigma = [1e-3 1e-1 1e-2 1e-5]'; % [S/m] electrical conductivites
+z = [0 5000]'; % [m] depths
+sigma = [0.01 0.002]'; % [S/m] electrical conductivites
 fs = 13; % Fontsize
 
 % Variables
 mu_0 = 4*pi*1e-7; % [H/m] magnetic permeability of free space
 
 [C] = Wait_recursion(omega,z,sigma,mu_0); % C-response [m]
-rho_a = (real(C).^2+imag(C).^2)*mu_0.*omega; % Apparent resistivity [Ohm.m]
+rho_a = abs(C).^2*mu_0.*omega; % Apparent resistivity [Ohm.m]
 phi = atand(imag(C)/real(C)) + 90; % Impedance phase [deg]
 
 % Regrouping data
