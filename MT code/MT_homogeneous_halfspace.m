@@ -23,16 +23,16 @@ E_0 = E_field(E1,omega,t,q,0);
 E_skin = E_field(E1,omega,t,q,skin);
 
 
-figure(2),clf
-plot(T,skin*1e-3,'-')
+figure
+plot(T,skin*1e-3,'.-')
 grid on
 xlabel('Period T [s]','FontSize',fs)
 ylabel('Skin depth [km]','FontSize',fs)
-title('MT forward model with synthetic datas','FontSize',fs)
+title('MT homogeneous half-space','FontSize',fs)
 legend('ocean','crust','upper mantle','lower mantle','core','Location','best')
 
 figure(3),clf
-plot(E_0-E_skin)
+plot(E_0-E_skin,'.-')
 xlabel('Re(E_0-E_{skin})','FontSize',fs)
 ylabel('Im(E_0-E_{skin})','FontSize',fs)
 grid on

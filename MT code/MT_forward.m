@@ -22,13 +22,13 @@ phi = atand(imag(C)/real(C)) + 90; % Impedance phase [deg]
 % Regrouping data
 % data = [freq';rho_a';phi'];
 
-figure(1),clf
-loglog(T,rho_a,'-o')
+figure
+loglog(T,rho_a,'.-')
 % plot(T, rho_a, '-o')
 grid on
 xlabel('Period T [s]','FontSize',fs)
 ylabel('Apparent resistivity \rho_a [\Omega\cdotm]','FontSize',fs)
-title('MT forward model with synthetic datas','FontSize',fs)
+title('MT forward model with synthetic data','FontSize',fs)
 
 
 
