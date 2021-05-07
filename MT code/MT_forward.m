@@ -8,8 +8,8 @@ load freq.mat;
 freq = freq'; % [Hz] frequency of signal
 T = 1./freq; % [s] period of signal
 omega = 2*pi*freq; % [Hz] angular frequency of signal
-z = [0 5000]'; % [m] depths
-sigma = [0.01 0.002]'; % [S/m] electrical conductivites
+z = [0 5000 10000]'; % [m] depths
+sigma = [0.01 3 0.01]'; % [S/m] electrical conductivites
 fs = 13; % Fontsize
 
 % Variables
