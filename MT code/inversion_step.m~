@@ -26,11 +26,11 @@ function [m_after, chi2] = inversion_step(C, T, d, m, M, N, dm, E, lambda, D)
 %-----------------------------------------------------------------------
 
 y_obs = log(C);
-% C_mod = C_wait(T, d, 1./exp(m)); % Bastien Ruols
-C_mod = Wait_recursion(T, d, 1./exp(m)); % Bart & Bruno
+C_mod = C_wait(T, d, 1./exp(m));
 y_mod = log(C_mod);
 delta_d = [real(y_obs-y_mod); imag(y_obs-y_mod)];
 
+J = jacobian_matrix(M,N,m,dm,T,d,y_mod);
 J = jacobian_matrix(M,N,m,dm,T,d,y_mod);
 
 delta_m = (J'*E*J + lambda*D'*D)\(J'*E*delta_d - lambda*D'*D*m);

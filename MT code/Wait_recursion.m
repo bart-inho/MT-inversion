@@ -1,4 +1,5 @@
-function [C] = Wait_recursion(omega,z,sigma)
+function [C] = Wait_recursion(T,thick,rho)
+% function [C] = Wait_recursion(omega,z,sigma)
 % Wait's recursion formula (2.33) from (Simpson & Bahr, 2005)
 %
 % Inputs:
@@ -14,15 +15,15 @@ function [C] = Wait_recursion(omega,z,sigma)
 mu_0 = 4*pi*1e-7; % [H/m] magnetic permeability of free space
 
 % Initialization
-q = sqrt(1i*mu_0*sigma(end)*omega); % [1/m] Inverse homogeneous half-space model transfer function 
+q = sqrt(1i*mu_0*2*pi./(T*rho(end))); % [1/m] Inverse homogeneous half-space model transfer function 
 C = 1./q; % Transfer function 
 
 % Wait's recursion algorithm
-for n=length(z)-1:-1:1
-    q = sqrt(1i*mu_0*sigma(n).*omega);
+for n=length(thick):-1:1
+    q = sqrt(1i*mu_0*2*pi./(T*rho(n)));
     % Wait's recursion formula
-    C = (       q.*C  + tanh(q.*(z(n+1)-z(n)))  ) ./ ...
-        (q.*(1+(q.*C .* tanh(q.*(z(n+1)-z(n))))));
+    C = (       q.*C  + tanh(q.*thick(n))  ) ./ ...
+        (q.*(1+(q.*C .* tanh(q.*thick(n)))));
 end
 
 

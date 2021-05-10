@@ -26,7 +26,8 @@ J = zeros(2*M, N);
 for k = 1:N
     m_int = m;
     m_int(k) = m_int(k)+dm;
-    C_mod_int = C_wait(T, d, 1./exp(m_int));
+    % C_mod = C_wait(T, d, 1./exp(m)); % Bastien Ruols
+    C_mod = Wait_recursion(T, d, 1./exp(m)); % Bart & Bruno
     y_m_int = log(C_mod_int);
     J(:,k) = [real(y_m_int-y_m)./dm; imag(y_m_int-y_m)./dm];
 end

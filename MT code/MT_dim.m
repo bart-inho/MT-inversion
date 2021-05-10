@@ -34,6 +34,7 @@ class(kappa> 0.1 & mu>= 0.05) = 3; % other shit
 
 figure()
 heatmap(class)
+% change yTicks to freq
 
 % (5.20)
 function commutator = commu(x, y)
