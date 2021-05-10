@@ -1,4 +1,4 @@
-function [C] = Wait_recursion(omega,z,sigma,mu_0)
+function [C] = Wait_recursion(omega,z,sigma)
 % Wait's recursion formula (2.33) from (Simpson & Bahr, 2005)
 %
 % Inputs:
@@ -11,6 +11,7 @@ function [C] = Wait_recursion(omega,z,sigma,mu_0)
 % - rho_a: apparent resistivity [Ohm.m]
 % - phi: impedance phase [deg]
 
+mu_0 = 4*pi*1e-7; % [H/m] magnetic permeability of free space
 
 % Initialization
 q = sqrt(1i*mu_0*sigma(end)*omega); % [1/m] Inverse homogeneous half-space model transfer function 

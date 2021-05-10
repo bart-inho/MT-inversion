@@ -15,7 +15,7 @@ fs = 13; % Fontsize
 % Variables
 mu_0 = 4*pi*1e-7; % [H/m] magnetic permeability of free space
 
-[C] = Wait_recursion(omega,z,sigma,mu_0); % C-response [m]
+[C] = Wait_recursion(omega,z,sigma); % C-response [m]
 rho_a = abs(C).^2*mu_0.*omega; % Apparent resistivity [Ohm.m]
 phi = atand(imag(C)/real(C)) + 90; % Impedance phase [deg]
 
