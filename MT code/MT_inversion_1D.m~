@@ -13,8 +13,6 @@ load Z.mat
 % Z(:,4,:) := Zyy
 
 T = 1./freq; % [s] periods
-sigma = ;
-rho = 1
 
 %% set-up of the inversion
 
@@ -26,12 +24,20 @@ Z(:,2,:) =  Z_B;
 Z(:,3,:) = -Z_B;
 
 % creation of the structure in depth
-nlayer = 5; % Number of layers
 thick = 50; % [m] Thickness of top layer
-for j=2:nlayer
-    thick(end+1) = 2*thick(j-1); % [m] Thicknesses of layers
-end
-C = Wait_recursion(T,thick,rho)
+sigma = 1e-1; % [S/m] electrical conductivity of top layer
+nlayer = 21; % Number of layers
+for j=2:nlayer-1
+    thick(end+1) = 1.2*thick(j-1); % [m] Thicknesses of layers
+    sigma(end+1) = 2*sigma(j-1); % [S/m] electrical conductivities of layers
+end, clear j
+thick(end+1) = 60e3; % [m] Thickness of last layer
+sigma(end+1) = 2*sigma(end); % [S/m] electrical conductivity of last layer
+rho = 1./sigma; % [Ohm.m] resistivities of layers
+
+C = Wait_recursion(T,thick,rho); % C-response of data
+
+return
 
 % starting model m_0
 
@@ -59,3 +65,9 @@ C = Wait_recursion(T,thick,rho)
     m_end = m_iter;
     
 % plot of results
+
+
+
+
+
+
