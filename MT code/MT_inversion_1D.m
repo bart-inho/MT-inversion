@@ -13,6 +13,7 @@ load Z.mat
 % Z(:,4,:) := Zyy
 
 T = 1./freq; % [s] periods
+ndata = length(freq);
 
 %% set-up of the inversion
 
@@ -30,8 +31,8 @@ thick(1) = 50; % [m] Thickness of top layer
 sigma = ones(nlayer,1);
 sigma(1) = 1e-1; % [S/m] electrical conductivity of top layer
 for j=2:nlayer-1
-    thick(end+1) = 1.2*thick(j-1); % [m] Thicknesses of layers
-    sigma(end+1) = 2*sigma(j-1); % [S/m] electrical conductivities of layers
+    thick(j) = 1.2*thick(j-1); % [m] Thicknesses of layers
+    sigma(j) = 2*sigma(j-1); % [S/m] electrical conductivities of layers
 end, clear j
 thick(end+1) = 60e3; % [m] Thickness of last layer
 sigma(end+1) = 2*sigma(end); % [S/m] electrical conductivity of last layer
@@ -43,6 +44,7 @@ dz = (0:50:2e4)';
 nz = length(dz);
 m0 = 0.02*ones(nz,1); % reference constant conductivity model (not considered if alphas=0)
 
+
 %% 1D inversion
 
 % Tip : you need to find the best lagrange lambda parameter that is in the
@@ -50,11 +52,26 @@ m0 = 0.02*ones(nz,1); % reference constant conductivity model (not considered if
 % different for each station.
 
 % derivative matrix D
+sm = ones(ndata,1);
+s0 = zeros(ndata, 1);
+D = spdiags([-sm sm s0], -1:1, ndata, ndata);
+D(end, :) = 0;
+
+% smoothness
+Wm = D'*D;
+lambda = 1e-2;
 
 % error matrix E
+E = spdiags(1./sqrt(variance),0,size(variance, 1),size(variance, 1)); %JI: added data weighting matrix to account for noise characteristics (see inversion notes)
 
 % inversion
-m_iter = m_start;
+m_iter = m0;
+thick_mod = dz;
+
+M = length(freq);
+N = nz;
+
+% m_iter = m_start;
 for iter = 1:25 % number of iterations (after 25 it doesnot change a 
                 % lot anymore, but you can put more iterations if you 
                 % want to check).
