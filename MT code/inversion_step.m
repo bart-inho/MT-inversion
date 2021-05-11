@@ -33,7 +33,7 @@ delta_d = [real(y_obs-y_mod); imag(y_obs-y_mod)];
 
 J = jacobian_matrix(M,N,m,dm,T,d,y_mod);
 
-delta_m = (J'*E*J + lambda*D'*D)\(J'*E*delta_d - lambda*D'*D*m);
+delta_m = (J'*E*J + lambda*(D'*D))\(J'*E*delta_d - lambda*(D'*D)*m);
 m_after = zeros(N,1);
 m_after(1:end-1) = m(1:end-1) + delta_m(1:end-1);
 m_after(end) = m(end); % keep the model of the last layer fixed
