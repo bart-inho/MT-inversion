@@ -66,7 +66,6 @@ m0 = 0.02*ones(nz,1); % reference constant conductivity model (not considered if
 % Tip : you need to find the best lagrange lambda parameter that is in the
 % elbow of the L-curve (see Irving slides and Constable 1987). Lambda is
 % different for each station.
-
 % derivative matrix D
 sm = ones(nlayer,1);
 s0 = zeros(nlayer, 1);
