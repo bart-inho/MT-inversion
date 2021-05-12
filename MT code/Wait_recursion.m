@@ -1,4 +1,4 @@
-function [C] = Wait_recursion(T,thick,rho)
+function [C,varargout] = Wait_recursion(T,thick,rho)
 % function [C] = Wait_recursion(omega,z,sigma)
 % Wait's recursion formula (2.33) from (Simpson & Bahr, 2005)
 %
@@ -26,12 +26,7 @@ for n=length(thick):-1:1
         (q.*(1+(q.*C .* tanh(q.*thick(n)))));
 end
 
-
-<<<<<<< HEAD
 if nargout > 1
     varargout{1} = abs(C).^2*mu0.*2*pi./T; % Apparent resistivity [Ohm.m]
     varargout{2} = atand(imag(C)./real(C)) + 90; % Impedance phase [deg]
 end
-=======
-
->>>>>>> e6eb7adc3952ef78067dd640f0664b0139de880c
