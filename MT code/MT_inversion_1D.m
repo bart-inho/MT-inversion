@@ -124,11 +124,11 @@ axis equal
 grid on
 hold off
 
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%% RETURN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 disp('Now chose data tip from L-curve, then run next section.')
 return
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 %% Lagrange parameter graphically selected
 % Export 'cursor_info' from chosen Data tip in L-curve
 
@@ -140,15 +140,15 @@ lambda = lamb_vec(index);
 chi2 = chi2_vec(index);
 m_end = m_vec(index,:);
 
-disp('Lagrange parameter lambda chosen.')
+disp(['Lagrange parameter lambda = ',num2str(lambda),' chosen.'])
 
 
-%% Forward model
+% Forward model
 
 [C_mod,rho_mod,phi_mod] = Wait_recursion(T,thick,1./m_end);
-disp('Forward model done.')
+disp(['Forward model with lambda = ',num2str(lambda),' done.'])
 
-%% Plots
+% Plots
 
 % Figure X2
 figure(fig+1), clf

@@ -31,4 +31,3 @@ if nargout > 1
     varargout{1} = abs(C).^2*mu0.*2*pi./T; % Apparent resistivity [Ohm.m]
     varargout{2} = atand(imag(C)./real(C)) + 90; % Impedance phase [deg]
 end
-
