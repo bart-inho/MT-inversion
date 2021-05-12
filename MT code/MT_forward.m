@@ -17,9 +17,9 @@ fs = 13; % Fontsize
 % Variables
 mu_0 = 4*pi*1e-7; % [H/m] magnetic permeability of free space
 
-[C] = Wait_recursion(T,thick,rho); % C-response [m]
-rho_a = abs(C).^2*mu_0.*omega; % Apparent resistivity [Ohm.m]
-phi = atand(imag(C)/real(C)) + 90; % Impedance phase [deg]
+[C,rho_a,phi] = Wait_recursion(T,thick,rho); % C-response [m]
+    % rho_a = abs(C).^2*mu_0.*omega; % Apparent resistivity [Ohm.m]
+    % phi = atand(imag(C)/real(C)) + 90; % Impedance phase [deg]
 
 % Regrouping data
 % data = [freq';rho_a';phi'];

@@ -40,6 +40,3 @@ m_after(end) = m(end); % keep the model of the last layer fixed
 
 chi2 = delta_d'*E*delta_d;
 
-
-
-
