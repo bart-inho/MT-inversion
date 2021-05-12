@@ -71,7 +71,7 @@ s0 = zeros(nlayer, 1);
 D = spdiags([-sm sm], -1:0, nlayer, nlayer);
 D(1, :) = 0;
 
-lamb_vec = logspace(-1, 4, 1e2)'; % Lagrange parameters 1.0235;%
+lamb_vec = logspace(-1, 2, 50)'; % Lagrange parameters 1.0235;%
 chi2_vec = zeros(size(lamb_vec)); % Chi-squared initialization
 R1D_vec = zeros(size(lamb_vec)); % Roughness parameter initialization
 m_vec = zeros(length(lamb_vec),length(sigma)); % Modeled conductivities initialization
@@ -166,6 +166,7 @@ plot(T,im_c./1e3,'g','LineWidth',lw)
 xlabel('T [s]','FontSize',fs)
 ylabel('C-response [km]','FontSize',fs)
 xlim(xLim)
+legend('real part', 'imaginary part', 'Location', 'NorthWest')
 grid on
 set(gca,'XScale','log');
 % --- subplot 3 ---
@@ -185,7 +186,8 @@ hold on
 loglog(T, rho_a,'or','LineWidth',lw)
 xlabel('T [s]','FontSize',fs)
 ylabel('Apparent resistivity \rho_a [\Omega\cdotm]','FontSize',fs)
-ylim([1 1e3])
+legend('modeled', 'observed', 'Location', 'NorthEast')
+ylim([0 1e3])
 xlim(xLim)
 grid on
 hold off
@@ -196,6 +198,7 @@ hold on
 semilogx(T, phi,'or','LineWidth',lw)
 xlabel('T [s]','FontSize',fs)
 ylabel('Phase \phi [deg]','FontSize',fs)
+legend('modeled', 'observed', 'Location', 'SouthEast')
 ylim([-180 180])
 xlim(xLim)
 grid on
