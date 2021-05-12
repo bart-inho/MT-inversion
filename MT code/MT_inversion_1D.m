@@ -1,4 +1,4 @@
-% Magnetotelluric (MT) 1-D inversion
+%% Magnetotelluric (MT) 1-D inversion
 
 clear
 
@@ -18,7 +18,7 @@ load variance.mat   % [-] Variance for 3 stations, with each component in:
     % - 2nd dimension of array is relative to a station
 
 T = 1./freq; % [s] Periods
-ome = 2*pi.*freq; % [1/s] Angular frequency
+omega = 2*pi.*freq; % [1/s] Angular frequency
 mu0 = 4*pi*1e-7; % [kg.m.s^-2.A^-2] Magnetic permeability of free space
 
 % Station of interest for the inversion
@@ -30,11 +30,11 @@ Z_B = (Z(:,2,stn)-Z(:,3,stn))./2; % Berdichevsky average: Equation (8.8) (Simpso
 Z = Z_B.*1e3; % [m/s] conversion from mm/s to m/s
 
 % C-response
-re_c = (1./ome).*imag(Z); % Eq. (???)
-im_c = (-1./ome).*real(Z); % Eq. (???)
+re_c = (1./omega).*imag(Z); % Eq. (???)
+im_c = (-1./omega).*real(Z); % Eq. (???)
 C = re_c + 1i*im_c;
 
-rho_a = abs(C).^2*mu0.*ome; % [Ohm.m] Apparent resistivity - Eq. (2.25) from Simpson & Bahr (2005)
+rho_a = abs(C).^2*mu0.*omega; % [Ohm.m] Apparent resistivity - Eq. (2.25) from Simpson & Bahr (2005)
 phi = atand(im_c./re_c)+90; % [deg] Impedance phase lag - Eq. (2.41) from Simpson & Bahr (2005)
 
 % Creation of the structure in depth
@@ -51,7 +51,7 @@ thick(end) = 60e3;
 % Depths of layer interfaces [m]
 z = zeros(size(thick));
 for i = 1:length(thick-1)
-    z(i+1) = sum(z)+thick(i);
+    z(i+1) = z(i)+thick(i);
 end
 
 % Electrical conductivity of last layer [S/m]
@@ -59,7 +59,7 @@ sigma = ones(nlayer,1);
 sigma(:) = 1/rho_a(end);
 
 
-%% 1D inversion
+% 1D inversion
 
 % Tip : you need to find the best lagrange lambda parameter that is in the
 % elbow of the L-curve (see Irving slides and Constable 1987). Lambda is
@@ -71,9 +71,10 @@ s0 = zeros(nlayer, 1);
 D = spdiags([-sm sm], -1:0, nlayer, nlayer);
 D(1, :) = 0;
 
-lamb_vec = 14;%logspace(-1, 4, 1e2)'; % Lagrange parameters
+lamb_vec = logspace(-1, 4, 1e2)'; % Lagrange parameters 1.0235;%
 chi2_vec = zeros(size(lamb_vec)); % Chi-squared initialization
-R1D = zeros(size(chi2_vec)); % Roughness parameter initialization
+R1D_vec = zeros(size(lamb_vec)); % Roughness parameter initialization
+m_vec = zeros(length(lamb_vec),length(sigma)); % Modeled conductivities initialization
 
 % Loop over the Lagrange parameters
 for s = 1:length(lamb_vec)
@@ -99,64 +100,107 @@ for s = 1:length(lamb_vec)
     m_end = m_iter;
     
     chi2_vec(s) = chi2;
-    R1D(s) = norm(D*m_end).^2;
+    R1D_vec(s) = norm(D*m_end).^2;
+    m_vec(s,:) = m_end;
 end
 
-% Lagrange parameter selection
-% dchi2 = abs(1-(chi2_vec-M));
-% ilambda = find(dchi2==min(dchi2));
-% lambda = lamb_vec(ilambda);
+disp('Inversion 1D done.')
 
 
-% Plot of results
+% Plot L-curve
 fs = 13; % ,'FontSize',fs
-fig = 21;
+lw = 1; % ,'LineWidth',lw
+fig = 01;
 
 % Figure X1
 figure(fig), clf
-sgtitle(['Data station ',num2str(stn)],'FontSize',fs+2)
+plot(chi2_vec-M, R1D_vec,'+-')
+hold on
+% plot(chi2_vec(ilambda)-M,R1D(ilambda),'or')
+title(['L-curve: station ',num2str(stn)],'FontSize',fs)
+xlabel('\chi^{2}-M','FontSize',fs)
+ylabel('R_{1D}','FontSize',fs)
+axis equal
+grid on
+hold off
+
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%% RETURN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+disp('Now chose data tip from L-curve, then run next section.')
+return
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Lagrange parameter graphically selected
+% Export 'cursor_info' from chosen Data tip in L-curve
+
+fs = 13; % ,'FontSize',fs
+lw = 1.5; % ,'LineWidth',lw
+
+index = 21; % cursor_info.DataIndex;
+lambda = lamb_vec(index);
+chi2 = chi2_vec(index);
+m_end = m_vec(index,:);
+
+disp('Lagrange parameter lambda chosen.')
+
+
+% Forward model
+
+[C_mod,rho_mod,phi_mod] = Wait_recursion(T,thick,1./m_end);
+disp('Forward model done.')
+
+% Plots
+
+% Figure X2
+figure(fig+1), clf
+sgtitle(['Station ',num2str(stn),...
+    ' : \chi^{2} = ',num2str(chi2),...
+    ' ; \lambda = ',num2str(lambda)],...
+    'FontSize',fs+2)
 xLim = [min(T) max(T)];
-subplot(2,1,1) % Apparent resistivity
-loglog(T, rho_a)
-xlabel('log_{10}T [s]')
+set(gcf,'Position',[100 100 800 500])
+% --- subplot 1 ---
+subplot(2,2,1) % C VS T
+plot(T,re_c./1e3,'m','LineWidth',lw)
+hold on
+plot(T,im_c./1e3,'g','LineWidth',lw)
+xlabel('T [s]','FontSize',fs)
+ylabel('C-response [km]','FontSize',fs)
+xlim(xLim)
+grid on
+set(gca,'XScale','log');
+% --- subplot 3 ---
+subplot(2,2,3) % rho VS z
+stairs(1./exp([m_end,m_end(end)]), z(1:end)./1e3,'b','LineWidth',lw)
+% title(['Model: station ',num2str(stn),' ; \lambda = ',num2str(lambda)])
+xlabel('Modeled resistivities \rho [\Omega\cdotm]','FontSize',fs)
+ylabel('Depth z [km]','FontSize',fs)
+ylim([0 10])
+set(gca,'XScale','log')
+grid on
+axis ij
+% --- subplot 2 ---
+subplot(2,2,2) % rho VS T
+loglog(T, rho_mod,'-b','LineWidth',lw)
+hold on
+loglog(T, rho_a,'or','LineWidth',lw)
+xlabel('T [s]','FontSize',fs)
 ylabel('Apparent resistivity \rho_a [\Omega\cdotm]','FontSize',fs)
 ylim([1 1e3])
 xlim(xLim)
 grid on
-subplot(2,1,2) % Impedance phase lag
-semilogx(T, phi)
-xlabel('Periods T [s]','FontSize',fs)
+hold off
+% --- subplot 4 ---
+subplot(2,2,4) % phi VS T
+semilogx(T, phi_mod,'-b','LineWidth',lw)
+hold on
+semilogx(T, phi,'or','LineWidth',lw)
+xlabel('T [s]','FontSize',fs)
 ylabel('Phase \phi [deg]','FontSize',fs)
 ylim([-180 180])
 xlim(xLim)
 grid on
-
-% Figure X2
-fig = fig+1;
-figure(fig), clf
-plot(chi2_vec-M, R1D,'+-')
-hold on
-% plot(chi2_vec(ilambda)-M,R1D(ilambda),'or')
-title(['L-curve',num2str(stn)],'FontSize',fs)
-xlabel('\chi^{2}-M','FontSize',fs)
-ylabel('R_{1D}','FontSize',fs)
-grid on
 hold off
 
-% Figure X3
-fig = fig+1;
-figure(fig), clf
-semilogx(1./exp(m_end), z(1:end-1)./1e3)
-title()
-xlabel('Modeled resisitivies \rho [Ohm.m]')
-ylabel('Depth z [km]')
-grid on
-axis ij
-
-% % Figure X4
-% fig = fig+1;
-% figure(fig), clf
-% plot(m_end,'o-')
-
+disp('End of code.')
 
 
