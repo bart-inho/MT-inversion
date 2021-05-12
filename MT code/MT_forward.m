@@ -15,11 +15,11 @@ rho = 1./sigma; % [Ohm.m] resistivities
 fs = 13; % Fontsize
 
 % Variables
-mu0 = 4*pi*1e-7; % [H/m] magnetic permeability of free space
+mu_0 = 4*pi*1e-7; % [H/m] magnetic permeability of free space
 
-[C,rho_a,phi] = Wait_recursion(T,thick,rho); % C-response [m]
-    % rho_a = abs(C).^2*mu0.*omega; % Apparent resistivity [Ohm.m]
-    % phi = atand(imag(C)/real(C)) + 90; % Impedance phase [deg]
+[C] = Wait_recursion(T,thick,rho); % C-response [m]
+rho_a = abs(C).^2*mu_0.*omega; % Apparent resistivity [Ohm.m]
+phi = atand(imag(C)/real(C)) + 90; % Impedance phase [deg]
 
 % Regrouping data
 % data = [freq';rho_a';phi'];
@@ -31,4 +31,6 @@ grid on
 xlabel('Period T [s]','FontSize',fs)
 ylabel('Apparent resistivity \rho_a [\Omega\cdotm]','FontSize',fs)
 title('MT forward model with synthetic data','FontSize',fs)
+
+
 

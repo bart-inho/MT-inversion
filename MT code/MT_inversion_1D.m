@@ -1,8 +1,8 @@
-%% Magnetotelluric (MT) 1-D inversion
+% Magnetotelluric (MT) 1-D inversion
 
 clear
 
-%% Loading of data, constants, etc...
+% Loading of data, constants, etc...
 
 load freq.mat % [1/s] Frequencies of measurements
 load Z.mat  % [mm/s] Impedance tensor for 3 stations, with each component in:
@@ -59,7 +59,7 @@ sigma = ones(nlayer,1);
 sigma(:) = 1/rho_a(end);
 
 
-%% 1D inversion
+% % 1D inversion
 
 % Tip : you need to find the best lagrange lambda parameter that is in the
 % elbow of the L-curve (see Irving slides and Constable 1987). Lambda is
@@ -107,7 +107,7 @@ end
 disp('Inversion 1D done.')
 
 
-%% Plot L-curve
+% Plot L-curve
 fs = 13; % ,'FontSize',fs
 lw = 1; % ,'LineWidth',lw
 fig = 01;
