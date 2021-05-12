@@ -3,7 +3,7 @@
 clear
 
 %% Loading of data, constants, etc...
- 
+
 load freq.mat % [1/s] Frequencies of measurements
 load Z.mat  % [mm/s] Impedance tensor for 3 stations, with each component in:
     % - 1st dimension of array (rows) is relative to a frequency 'freq'
