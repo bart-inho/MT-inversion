@@ -21,7 +21,7 @@ function [m_after, chi2] = inversion_step(C, T, d, m, M, N, dm, E, lambda, D)
 %   D : Diagonal (N*N) matrix from Occam's method
 %
 % ON OUTPUT:
-%   m_after : model after iteration
+%   m_after : model after iteration EN LOG PTN
 %   chi2 : data misfit chi2 parameter
 %-----------------------------------------------------------------------
 

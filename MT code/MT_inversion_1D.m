@@ -3,7 +3,7 @@
 clear
 
 % Station of interest for the inversion
-stn = 1;
+stn = 3;
 
 disp(['Station ',num2str(stn),'.'])
 
@@ -51,14 +51,13 @@ end, clear j
 thick(end) = 60e3;
 
 % Depths of layer interfaces [m]
-z = zeros(size(thick));
-for i = 1:length(thick)-1
+z = zeros(size(thick,1)+1,1);
+for i = 1:length(thick)
     z(i+1) = z(i)+thick(i);
 end
 
 % Electrical conductivity of last layer [S/m]
-sigma = ones(nlayer,1); 
-sigma(:) = 1/rho_a(end);
+sigma = 1/rho_a(end) * ones(nlayer,1);
 
 
 % % 1D inversion
@@ -73,23 +72,25 @@ s0 = zeros(nlayer, 1);
 D = spdiags([-sm sm], -1:0, nlayer, nlayer);
 D(1, :) = 0;
 
-lamb_vec = logspace(-1, 2, 50)'; % Lagrange parameters 1.0235;%
+% Error matrix E
+E = diag([1./variance(:,stn); 1./variance(:,stn)]);
+
+thick_mod = thick(1:end-1);
+
+% Dimensions
+M = length(freq);
+N = length(sigma);
+
+% Initialization
+% % % lamb_vec = logspace(-1, 2, 50)'; % Lagrange parameters 1.0235;%
+lamb_vec = logspace(4, -1, 150)'; % Lagrange parameters 1.0235;%
 chi2_vec = zeros(size(lamb_vec)); % Chi-squared initialization
 R1D_vec = zeros(size(lamb_vec)); % Roughness parameter initialization
-m_vec = zeros(length(lamb_vec),length(sigma)); % Modeled conductivities initialization
+m_vec = zeros(length(sigma),length(lamb_vec)); % Modeled conductivities initialization
 
 % Loop over the Lagrange parameters
 for s = 1:length(lamb_vec)
     lambda = lamb_vec(s); % Lagrange parameter used for the inversion
-
-    % Error matrix E
-    E = diag([1./variance(:,stn); 1./variance(:,stn)]);
-
-    % Inversion    
-    thick_mod = thick(1:end-1);
-
-    M = length(freq);
-    N = length(sigma);
 
     m_iter = log(sigma); % Initial model (has to be log, cf. 'inversion_step.m')
     for iter = 1:25 % Number of iterations (after 25 it doesnot change a 
@@ -103,7 +104,7 @@ for s = 1:length(lamb_vec)
     
     chi2_vec(s) = chi2;
     R1D_vec(s) = norm(D*m_end).^2;
-    m_vec(s,:) = m_end;
+    m_vec(:,s) = m_end;
 end
 
 disp('Inversion 1D done.')
@@ -129,26 +130,43 @@ hold off
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%% RETURN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 disp('Now chose data tip (lambda) in the elbow of L-curve, then run next section.')
+% Export cursor data to workspace from selected data tip in L-curve and
+% name it 'cursor_info'.
 return
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lagrange parameter graphically selected
-% Export cursor data to workspace from selected data tip in L-curve and
-% name it 'cursor_info'.
 
 fs = 13; % ,'FontSize',fs
 lw = 1.5; % ,'LineWidth',lw
 
-index = cursor_info.DataIndex;
+% % % index = cursor_info.DataIndex;
+index = 120;
 lambda = lamb_vec(index);
 chi2 = chi2_vec(index);
-m_end = m_vec(index,:);
+m_end = m_vec(:,index);
+
+% % % % % % % %
+% Je pense que vous avez confondu la résistivité apparente rho_a qui est
+% unique pour chaque mesure donc fréquence, et qui vous donne une idée sur
+% la structure interne, avec les résistivités des couches rho_mod. rho_a a
+% donc une dimension 36*1 alors que rho_mod 21*1
+% % % % % % % %
+% NEW LINE : 
+rho_model = 1./exp(m_end);
 
 disp(['Lagrange parameter lambda = ',num2str(lambda),' chosen.'])
 
 
 % Forward model
+% % % % % % % %
+% même erreur que la dernière fois... ce qui sort de inversion_step c'est
+% log(sigma) donc ill faut que vous mettiez exp dans votre input à
+% Wait_recursion...
+% % % % % % % %
+% FAUX : [C_mod,rho_mod,phi_mod] = Wait_recursion(T,thick,1./m_end);
+% NEW LINE : 
+[C_forward,rho_a_forward,phi_forward] = Wait_recursion(T,thick,1./exp(m_end));
 
-[C_mod,rho_mod,phi_mod] = C_wait(T,thick,1./m_end);
 disp('Forward model done.')
 
 % Plots
@@ -163,18 +181,25 @@ xLim = [min(T) max(T)];
 set(gcf,'Position',[100 100 800 500])
 % --- subplot 1 ---
 subplot(2,2,1) % C VS T
-plot(T,re_c./1e3,'m','LineWidth',lw)
+% % % In this plot the objective if to see the results, so you use the C,
+% rhoa and phi calculated with the forward pb from the restulted model
+% FAUX : plot(T,re_c./1e3,'m','LineWidth',lw)
+% NEW LINE :
+plot(T,real(C_forward)./1e3,'m','LineWidth',lw)
 hold on
-plot(T,im_c./1e3,'g','LineWidth',lw)
+% FAUX : plot(T,im_c./1e3,'g','LineWidth',lw)
+% NEW LINE :
+plot(T,imag(C_forward)./1e3,'g','LineWidth',lw)
 xlabel('T [s]','FontSize',fs)
 ylabel('C-response [km]','FontSize',fs)
-xlim(xLim)
+xlim padded
 legend('real part', 'imaginary part', 'Location', 'NorthWest')
 grid on
 set(gca,'XScale','log');
 % --- subplot 3 ---
 subplot(2,2,3) % rho VS z
-stairs(1./exp([m_end,m_end(end)]), z(1:end)./1e3,'b','LineWidth',lw)
+% % % stairs(1./exp([m_end;m_end(end)]), z./1e3,'b','LineWidth',lw)
+stairs([rho_model(1); rho_model], [z]/1e3,'b','LineWidth',lw)
 % title(['Model: station ',num2str(stn),' ; \lambda = ',num2str(lambda)])
 xlabel('Modeled resistivity \rho [\Omega\cdotm]','FontSize',fs)
 ylabel('Depth z [km]','FontSize',fs)
@@ -184,26 +209,29 @@ grid on
 axis ij
 % --- subplot 2 ---
 subplot(2,2,2) % rho VS T
-loglog(T, rho_mod,'-b','LineWidth',lw)
+% % % 
+loglog(T, rho_a_forward,'-b','LineWidth',lw)
 hold on
+% % % 
 loglog(T, rho_a,'or','LineWidth',lw)
 xlabel('T [s]','FontSize',fs)
 ylabel('Apparent resistivity \rho_a [\Omega\cdotm]','FontSize',fs)
 legend('modeled', 'observed', 'Location', 'NorthEast')
 ylim([0 1e3])
-xlim(xLim)
+xlim padded
 grid on
 hold off
 % --- subplot 4 ---
 subplot(2,2,4) % phi VS T
-semilogx(T, phi_mod,'-b','LineWidth',lw)
+% % % 
+semilogx(T, phi_forward,'-b','LineWidth',lw)
 hold on
 semilogx(T, phi,'or','LineWidth',lw)
 xlabel('T [s]','FontSize',fs)
 ylabel('Phase \phi [deg]','FontSize',fs)
 legend('modeled', 'observed', 'Location', 'SouthEast')
 ylim([-180 180])
-xlim(xLim)
+xlim padded
 grid on
 hold off
 
