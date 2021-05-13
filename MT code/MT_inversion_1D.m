@@ -2,6 +2,11 @@
 
 clear
 
+% Station of interest for the inversion
+stn = 1;
+
+disp(['Station ',num2str(stn),'.'])
+
 % Loading of data, constants, etc...
 
 load freq.mat % [1/s] Frequencies of measurements
@@ -20,9 +25,6 @@ load variance.mat   % [-] Variance for 3 stations, with each component in:
 T = 1./freq; % [s] Periods
 omega = 2*pi.*freq; % [1/s] Angular frequency
 mu0 = 4*pi*1e-7; % [kg.m.s^-2.A^-2] Magnetic permeability of free space
-
-% Station of interest for the inversion
-stn = 1;
 
 % Impedance tensor transformed to 1D
 Z_B = (Z(:,2,stn)-Z(:,3,stn))./2; % Berdichevsky average: Equation (8.8) (Simpson & Bahr, 2005)
@@ -50,7 +52,7 @@ thick(end) = 60e3;
 
 % Depths of layer interfaces [m]
 z = zeros(size(thick));
-for i = 1:length(thick-1)
+for i = 1:length(thick)-1
     z(i+1) = z(i)+thick(i);
 end
 
@@ -110,7 +112,7 @@ disp('Inversion 1D done.')
 % Plot L-curve
 fs = 13; % ,'FontSize',fs
 lw = 1; % ,'LineWidth',lw
-fig = 01;
+fig = stn*10+1;
 
 % Figure X1
 figure(fig), clf
@@ -126,16 +128,17 @@ hold off
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%% RETURN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-disp('Now chose data tip from L-curve, then run next section.')
+disp('Now chose data tip (lambda) in the elbow of L-curve, then run next section.')
 return
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lagrange parameter graphically selected
-% Export 'cursor_info' from chosen Data tip in L-curve
+% Export cursor data to workspace from selected data tip in L-curve and
+% name it 'cursor_info'.
 
 fs = 13; % ,'FontSize',fs
 lw = 1.5; % ,'LineWidth',lw
 
-index = 21; % cursor_info.DataIndex;
+index = cursor_info.DataIndex;
 lambda = lamb_vec(index);
 chi2 = chi2_vec(index);
 m_end = m_vec(index,:);
@@ -145,8 +148,8 @@ disp(['Lagrange parameter lambda = ',num2str(lambda),' chosen.'])
 
 % Forward model
 
-[C_mod,rho_mod,phi_mod] = Wait_recursion(T,thick,1./m_end);
-disp(['Forward model with lambda = ',num2str(lambda),' done.'])
+[C_mod,rho_mod,phi_mod] = C_wait(T,thick,1./m_end);
+disp('Forward model done.')
 
 % Plots
 
@@ -173,7 +176,7 @@ set(gca,'XScale','log');
 subplot(2,2,3) % rho VS z
 stairs(1./exp([m_end,m_end(end)]), z(1:end)./1e3,'b','LineWidth',lw)
 % title(['Model: station ',num2str(stn),' ; \lambda = ',num2str(lambda)])
-xlabel('Modeled resistivities \rho [\Omega\cdotm]','FontSize',fs)
+xlabel('Modeled resistivity \rho [\Omega\cdotm]','FontSize',fs)
 ylabel('Depth z [km]','FontSize',fs)
 ylim([0 10])
 set(gca,'XScale','log')
