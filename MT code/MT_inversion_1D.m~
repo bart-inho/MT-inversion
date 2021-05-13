@@ -3,7 +3,7 @@
 clear
 
 % Station of interest for the inversion
-stn = 3;
+stn = 1;
 
 disp(['Station ',num2str(stn),'.'])
 
@@ -77,7 +77,7 @@ E = diag([1./variance(:,stn); 1./variance(:,stn)]);
 
 thick_mod = thick(1:end-1);
 
-% Dimensions
+
 M = length(freq);
 N = length(sigma);
 
@@ -85,7 +85,7 @@ N = length(sigma);
 lamb_vec = logspace(-1, 2, 50)'; % Lagrange parameters 1.0235;%
 chi2_vec = zeros(size(lamb_vec)); % Chi-squared initialization
 R1D_vec = zeros(size(lamb_vec)); % Roughness parameter initialization
-m_vec = zeros(length(sigma),length(lamb_vec)); % Modeled conductivities initialization
+m_vec = zeros(length(lamb_vec),length(sigma)); % Modeled conductivities initialization
 
 % Loop over the Lagrange parameters
 for s = 1:length(lamb_vec)
@@ -103,7 +103,7 @@ for s = 1:length(lamb_vec)
     
     chi2_vec(s) = chi2;
     R1D_vec(s) = norm(D*m_end).^2;
-    m_vec(:,s) = m_end;
+    m_vec(s,:) = m_end;
 end
 
 disp('Inversion 1D done.')
@@ -141,14 +141,14 @@ lw = 1.5; % ,'LineWidth',lw
 index = cursor_info.DataIndex;
 lambda = lamb_vec(index);
 chi2 = chi2_vec(index);
-m_end = m_vec(:,index);
+m_end = m_vec(index,:);
 
 disp(['Lagrange parameter lambda = ',num2str(lambda),' chosen.'])
 
 
 % Forward model
-[C_mod,rho_mod,phi_mod] = Wait_recursion(T,thick,1./m_end);
 
+[C_mod,rho_mod,phi_mod] = Wait_recursion(T,thick,1./m_end);
 disp('Forward model done.')
 
 % Plots
@@ -174,7 +174,7 @@ grid on
 set(gca,'XScale','log');
 % --- subplot 3 ---
 subplot(2,2,3) % rho VS z
-stairs(1./exp([m_end;m_end(end)]), z./1e3,'b','LineWidth',lw)
+stairs(1./exp([m_end m_end(end)]), z./1e3,'b','LineWidth',lw)
 % title(['Model: station ',num2str(stn),' ; \lambda = ',num2str(lambda)])
 xlabel('Modeled resistivity \rho [\Omega\cdotm]','FontSize',fs)
 ylabel('Depth z [km]','FontSize',fs)
