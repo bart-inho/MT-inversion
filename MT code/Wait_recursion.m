@@ -3,9 +3,9 @@ function [C,varargout] = Wait_recursion(T,thick,rho)
 % Wait's recursion formula (2.33) from (Simpson & Bahr, 2005)
 %
 % Inputs:
-% - omega: angular frequency [Hz]
-% - z: depth of bottom interface [m]
-% - sigma: electrical conductivity [S/m]
+% - T: period [s]
+% - thick: thickness of layers [m]
+% - rho: electrical resistivity [Ohm.m]
 %
 % Outputs:
 % - C: Schmucker-Weidelt transfer function (Weidelt, 1972; Schmucker, 1973) [1/m]
