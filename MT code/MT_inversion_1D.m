@@ -3,7 +3,7 @@
 clear
 
 % Station of interest for the inversion
-stn = 3;
+stn = 1;
 
 disp(['Station ',num2str(stn),'.'])
 
@@ -140,7 +140,7 @@ fs = 13; % ,'FontSize',fs
 lw = 1.5; % ,'LineWidth',lw
 
 % % % index = cursor_info.DataIndex;
-index = 120;
+index = cursor_info.DataIndex;
 lambda = lamb_vec(index);
 chi2 = chi2_vec(index);
 m_end = m_vec(:,index);
@@ -173,7 +173,7 @@ disp('Forward model done.')
 
 % Figure X2
 figure(fig+1), clf
-sgtitle(['Station ',num2str(stn),...
+sgtitle(['Station 90',num2str(stn),...
     ' : \chi^{2} = ',num2str(chi2),...
     ' ; \lambda = ',num2str(lambda)],...
     'FontSize',fs+2)
