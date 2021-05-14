@@ -1,11 +1,17 @@
-% Magnetotelluric (MT) 1-D inversion
+%% Magnetotelluric (MT) 1-D inversion
+
+% Section 1
 
 clear
 
 % Station of interest for the inversion
-stn = 1;
+stn = 3;
+    % (1) Station 901
+    % (2) Station 902
+    % (3) Station 903
 
-disp(['Station ',num2str(stn),'.'])
+disp(['Station 90',num2str(stn),'.'])
+disp('Begin Section 1.')
 
 % Loading of data, constants, etc...
 
@@ -110,17 +116,18 @@ end
 disp('Inversion 1D done.')
 
 
-% Plot L-curve
+% Plot parameters
 fs = 13; % ,'FontSize',fs
-lw = 1; % ,'LineWidth',lw
+lw = 1.5; % ,'LineWidth',lw
 fig = stn*10+1;
 
+% L-curve
 % Figure X1
 figure(fig), clf
-plot(chi2_vec-M, R1D_vec,'+-')
+plot(chi2_vec-M, R1D_vec,'+-','LineWidth',lw)
 hold on
 % plot(chi2_vec(ilambda)-M,R1D(ilambda),'or')
-title(['L-curve: station ',num2str(stn)],'FontSize',fs)
+title(['L-curve: station 90',num2str(stn)],'FontSize',fs)
 xlabel('\chi^{2}-M','FontSize',fs)
 ylabel('R_{1D}','FontSize',fs)
 axis equal
@@ -129,18 +136,34 @@ hold off
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%% RETURN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-disp('Now chose data tip (lambda) in the elbow of L-curve, then run next section.')
+disp('End of Section 1.')
+disp('Now choose data tip (lambda) in the elbow of L-curve, then run Section 2 or set index parameter in Section 2.')
 % Export cursor data to workspace from selected data tip in L-curve and
 % name it 'cursor_info'.
 return
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Lagrange parameter graphically selected
+%% Section 2 - Lagrange parameter graphically selected
 
+disp('Begin Section 2.')
+
+% Plot parameters
 fs = 13; % ,'FontSize',fs
-lw = 1.5; % ,'LineWidth',lw
+lw = 1.2; % ,'LineWidth',lw
 
-% % % index = cursor_info.DataIndex;
-index = cursor_info.DataIndex;
+% index = cursor_info.DataIndex; % Choose data tip in elbow of L-curve
+index = 0; % Set chosen lambda and skip choosing data tip step
+if index==0
+    if stn==1
+        index = 120;
+    elseif stn==2
+        index = 117;
+    elseif stn==3
+        index = 121;
+    else
+        error('No station selected.')
+    end
+end
+
 lambda = lamb_vec(index);
 chi2 = chi2_vec(index);
 m_end = m_vec(:,index);
@@ -177,7 +200,8 @@ sgtitle(['Station 90',num2str(stn),...
     ' : \chi^{2} = ',num2str(chi2),...
     ' ; \lambda = ',num2str(lambda)],...
     'FontSize',fs+2)
-xLim = [min(T) max(T)];
+padded = 0.7;
+xLim = [min(T)*(1-padded) max(T)*(1+padded)];
 set(gcf,'Position',[100 100 800 500])
 % --- subplot 1 ---
 subplot(2,2,1) % C VS T
@@ -192,7 +216,7 @@ hold on
 plot(T,imag(C_forward)./1e3,'g','LineWidth',lw)
 xlabel('T [s]','FontSize',fs)
 ylabel('C-response [km]','FontSize',fs)
-xlim padded
+xlim(xLim)
 legend('real part', 'imaginary part', 'Location', 'NorthWest')
 grid on
 set(gca,'XScale','log');
@@ -218,7 +242,7 @@ xlabel('T [s]','FontSize',fs)
 ylabel('Apparent resistivity \rho_a [\Omega\cdotm]','FontSize',fs)
 legend('modeled', 'observed', 'Location', 'NorthEast')
 ylim([0 1e3])
-xlim padded
+xlim(xLim)
 grid on
 hold off
 % --- subplot 4 ---
@@ -231,10 +255,61 @@ xlabel('T [s]','FontSize',fs)
 ylabel('Phase \phi [deg]','FontSize',fs)
 legend('modeled', 'observed', 'Location', 'SouthEast')
 ylim([-180 180])
-xlim padded
+xlim(xLim)
 grid on
 hold off
 
+
+% L-curve with selected lambda
+% Figure X3 
+figure(fig+2), clf
+plot(chi2_vec-M, R1D_vec,'+-','LineWidth',lw)
+hold on
+scatter(chi2_vec(index)-M,R1D_vec(index),50,'o','LineWidth',2)
+hold off
+title(['L-curve: station 90',num2str(stn)],'FontSize',fs)
+xlabel('\chi^{2}-M','FontSize',fs)
+ylabel('R_{1D}','FontSize',fs)
+axis equal
+xlim([0 10])
+ylim([0 10])
+legend('L-curve',['\lambda = ',num2str(lambda)],'FontSize',fs)
+grid on
+
+disp('End of Section 2.')
 disp('End of code.')
+
+
+%% (Optional section) Saving/printing figures
+
+disp('Begin figure printing.')
+
+% Step 1: Make sure all figures to be saved are open
+
+% Step 2: Set printing parameters
+filedir = 'figure-inv/'; % file directory
+fileformat = '-depsc'; % printing format
+
+% Step 3: Save L-curves with chosen lambda & results of inversion
+for ifig=12:10:32
+    
+    filestn = ['_Station90',num2str((ifig-2)/10)]; % Station number
+    
+    % Results of inversion
+    figure(ifig)
+    filename = [filedir,'Results',filestn];
+    print(filename,fileformat)
+    
+    % L-curves
+    figure(ifig+1)
+    filename = [filedir,'Lcurve',filestn];
+    print(filename,fileformat)
+    
+end
+
+disp('Figures printed.')
+disp('End.')
+
+
 
 
