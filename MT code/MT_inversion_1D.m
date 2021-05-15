@@ -198,7 +198,7 @@ disp('Forward model done.')
 figure(fig+1), clf
 sgtitle(['Station 90',num2str(stn),...
     ' : \chi^{2} = ',num2str(chi2),...
-    ' ; \lambda = ',num2str(lambda)],...
+    ' ; \lambda = ',num2str(round(lambda,2))],...
     'FontSize',fs+2)
 padded = 0.7;
 xLim = [min(T)*(1-padded) max(T)*(1+padded)];
@@ -273,7 +273,7 @@ ylabel('R_{1D}','FontSize',fs)
 axis equal
 xlim([0 10])
 ylim([0 10])
-legend('L-curve',['\lambda = ',num2str(lambda)],'FontSize',fs)
+legend('L-curve',['\lambda = ',num2str(round(lambda,2))],'FontSize',fs)
 grid on
 
 disp('End of Section 2.')
