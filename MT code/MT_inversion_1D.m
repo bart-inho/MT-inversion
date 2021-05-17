@@ -38,8 +38,8 @@ Z_B = (Z(:,2,stn)-Z(:,3,stn))./2; % Berdichevsky average: Equation (8.8) (Simpso
 Z = Z_B.*1e3; % [m/s] conversion from mm/s to m/s
 
 % C-response
-re_c = (1./omega).*imag(Z); % Eq. (???)
-im_c = (-1./omega).*real(Z); % Eq. (???)
+re_c = (1./omega).*imag(Z); % Eq. (?)
+im_c = (-1./omega).*real(Z); % Eq. (?)
 C = re_c + 1i*im_c;
 
 rho_a = abs(C).^2*mu0.*omega; % [Ohm.m] Apparent resistivity - Eq. (2.25) from Simpson & Bahr (2005)
@@ -137,7 +137,7 @@ hold off
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%% RETURN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 disp('End of Section 1.')
-disp('Now choose data tip (lambda) in the elbow of L-curve, then run Section 2 or set index parameter in Section 2.')
+disp('Now choose data tip (lambda) in the elbow of L-curve, then run Section 2 or set ''index'' parameter in Section 2.')
 % Export cursor data to workspace from selected data tip in L-curve and
 % name it 'cursor_info'.
 return
