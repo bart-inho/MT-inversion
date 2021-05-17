@@ -1,17 +1,28 @@
-% Dimensionality
-% -	Z: les composants des tenseurs d'impédance 
-%   -	colonne 1 : Zxx
-%   -	colonne 2 : Zxy
-%   -	colonne 3 : Zyx
-%   -	colonne 4 : Zyy
-%       - dimension 1 : Z relative to frequency
-%       - dimension 2 : impedence tensor
-%       - dimension 3 : datasets
+% Magnetotelluric (MT) and Dimensionality
+%
+% Sources: (Simpson & Bahr, 2005)
 
 clear
 
-load Z
-load freq
+load freq.mat % [1/s] Frequencies of measurements
+load Z.mat  % [mm/s] Impedance tensor for 3 stations, with each component in:
+    % - 1st dimension of array (rows) is relative to a frequency 'freq'
+    % - 2nd dimension of array (columns) is relative to one component of the tensor Z
+        % Z(:,1,:) := Zxx
+        % Z(:,2,:) := Zxy
+        % Z(:,3,:) := Zyx
+        % Z(:,4,:) := Zyy
+    % - 3rd dimension of array is relative to a station
+
+% -------------------------
+% Verification with 1D tensor
+% Impedance tensor transformed to 1D
+% Z_B = (Z(:,2,:)-Z(:,3,:))./2; % Berdichevsky average: Equation (8.8) (Simpson & Bahr, 2005)
+% Z(:,1,:) = 0;
+% Z(:,4,:) = 0;
+% Z(:,2,:) = Z_B;
+% Z(:,3,:) = -Z_B;
+% -------------------------
 
 % equation (5.6)
 S1 = Z(:,1,:) + Z(:,4,:);
@@ -35,17 +46,19 @@ class(kappa< 0.1 & sigma>= 0.05) = 1.5; % class 1b (Simple 2-D model)
 class(kappa> 0.1 & mu < 0.05) = 2; % class 2 (regional 1-D model with galvanic distortion)
 class(kappa> 0.1 & mu>= 0.05) = 3; % other
 
-dataset = {'Dataset 1','Dataset 2','Dataset 3'};
-classname = {'Class 1a','Class 1b','Class 2','Class 3'};
+dataset = {'Station 901','Station 902','Station 903'};
+classname = {'Class 1a','Class 1b','Class 2','Other complicated classes'};
 % classname = cell(size(class));
 % classname(class==1  ) = {'1a'};
 % classname(class==1.5) = {'1b'};
 % classname(class==2  ) = {'2 '};
 % classname(class==3  ) = {'other'};
 
-figure(1)
-h = heatmap(dataset,round(freq,2,'significant'),class);
-ylabel('Frequency [Hz]')
+fs = 10; % ,'FontSize',fs
+
+figure
+h = heatmap(dataset,round(1./freq,2,'significant'),class,'FontSize',fs);
+ylabel('Periods [s]')
 colorbar off
 
 % (5.20)

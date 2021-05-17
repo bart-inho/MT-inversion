@@ -197,7 +197,7 @@ disp('Forward model done.')
 % Figure X2
 figure(fig+1), clf
 sgtitle(['Station 90',num2str(stn),...
-    ' : \chi^{2} = ',num2str(chi2),...
+    ' : \chi^{2} = ',num2str(round(chi2,2)),...
     ' ; \lambda = ',num2str(round(lambda,2))],...
     'FontSize',fs+2)
 padded = 0.7;
@@ -267,7 +267,7 @@ plot(chi2_vec-M, R1D_vec,'+-','LineWidth',lw)
 hold on
 scatter(chi2_vec(index)-M,R1D_vec(index),50,'o','LineWidth',2)
 hold off
-title(['L-curve: station 90',num2str(stn)],'FontSize',fs)
+title(['Station 90',num2str(stn)],'FontSize',fs)
 xlabel('\chi^{2}-M','FontSize',fs)
 ylabel('R_{1D}','FontSize',fs)
 axis equal
@@ -298,11 +298,13 @@ for ifig=12:10:32
     % Results of inversion
     figure(ifig)
     filename = [filedir,'Results',filestn];
+    saveas(gcf,filename,'fig')
     print(filename,fileformat)
     
     % L-curves
     figure(ifig+1)
     filename = [filedir,'Lcurve',filestn];
+    saveas(gcf,filename,'fig')
     print(filename,fileformat)
     
 end
