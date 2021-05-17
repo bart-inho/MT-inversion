@@ -227,6 +227,7 @@ stairs([rho_model(1); rho_model], [z]/1e3,'b','LineWidth',lw)
 % title(['Model: station ',num2str(stn),' ; \lambda = ',num2str(lambda)])
 xlabel('Modeled resistivity \rho [\Omega\cdotm]','FontSize',fs)
 ylabel('Depth z [km]','FontSize',fs)
+xlim([1 1e3])
 ylim([0 10])
 set(gca,'XScale','log')
 grid on
@@ -271,7 +272,7 @@ title(['Station 90',num2str(stn)],'FontSize',fs)
 xlabel('\chi^{2}-M','FontSize',fs)
 ylabel('R_{1D}','FontSize',fs)
 axis equal
-xlim([0 10])
+xlim([0 12])
 ylim([0 10])
 legend('L-curve',['\lambda = ',num2str(round(lambda,2))],'FontSize',fs)
 grid on
