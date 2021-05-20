@@ -1,11 +1,16 @@
 %% Magnetotelluric (MT) 1-D inversion
+% 
+% Camp de Geophysique d'Exploration
+% Projet 5: Magnetotellurique
+% Barthelemy Anhorn & Bruno Galissard de Marignac
+
 
 % Section 1
 
 clear
 
 % Station of interest for the inversion
-stn = 3;
+stn = 1;
     % (1) Station 901
     % (2) Station 902
     % (3) Station 903
@@ -34,12 +39,11 @@ mu0 = 4*pi*1e-7; % [kg.m.s^-2.A^-2] Magnetic permeability of free space
 
 % Impedance tensor transformed to 1D
 Z_B = (Z(:,2,stn)-Z(:,3,stn))./2; % Berdichevsky average: Equation (8.8) (Simpson & Bahr, 2005)
-% Z_B = (real(Z(:,2,k))-real(Z(:,3,k)))./2 + 1i* (imag(Z(:,2,k))-imag(Z(:,3,k)))./2;
 Z = Z_B.*1e3; % [m/s] conversion from mm/s to m/s
 
 % C-response
-re_c = (1./omega).*imag(Z); % Eq. (?)
-im_c = (-1./omega).*real(Z); % Eq. (?)
+re_c = (1./omega).*imag(Z);
+im_c = (-1./omega).*real(Z);
 C = re_c + 1i*im_c;
 
 rho_a = abs(C).^2*mu0.*omega; % [Ohm.m] Apparent resistivity - Eq. (2.25) from Simpson & Bahr (2005)
@@ -88,8 +92,7 @@ M = length(freq);
 N = length(sigma);
 
 % Initialization
-% % % lamb_vec = logspace(-1, 2, 50)'; % Lagrange parameters 1.0235;%
-lamb_vec = logspace(4, -1, 150)'; % Lagrange parameters 1.0235;%
+lamb_vec = logspace(4, -1, 150)'; % Lagrange parameters
 chi2_vec = zeros(size(lamb_vec)); % Chi-squared initialization
 R1D_vec = zeros(size(lamb_vec)); % Roughness parameter initialization
 m_vec = zeros(length(sigma),length(lamb_vec)); % Modeled conductivities initialization
@@ -126,7 +129,6 @@ fig = stn*10+1;
 figure(fig), clf
 plot(chi2_vec-M, R1D_vec,'+-','LineWidth',lw)
 hold on
-% plot(chi2_vec(ilambda)-M,R1D(ilambda),'or')
 title(['L-curve: station 90',num2str(stn)],'FontSize',fs)
 xlabel('\chi^{2}-M','FontSize',fs)
 ylabel('R_{1D}','FontSize',fs)
@@ -137,7 +139,7 @@ hold off
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%% RETURN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 disp('End of Section 1.')
-disp('Now choose data tip (lambda) in the elbow of L-curve, then run Section 2 or set ''index'' parameter in Section 2.')
+disp('Now, either choose data tip (lambda) in the elbow of L-curve, or set ''index'' parameter in Section 2, then run Section 2.')
 % Export cursor data to workspace from selected data tip in L-curve and
 % name it 'cursor_info'.
 return
@@ -150,8 +152,8 @@ disp('Begin Section 2.')
 fs = 13; % ,'FontSize',fs
 lw = 1.2; % ,'LineWidth',lw
 
-% index = cursor_info.DataIndex; % Choose data tip in elbow of L-curve
-index = 0; % Set chosen lambda and skip choosing data tip step
+index = cursor_info.DataIndex; % Choose data tip in elbow of L-curve
+% index = 0; % Set chosen lambda and skip choosing data tip step
 if index==0
     if stn==1
         index = 120;
@@ -168,26 +170,11 @@ lambda = lamb_vec(index);
 chi2 = chi2_vec(index);
 m_end = m_vec(:,index);
 
-% % % % % % % %
-% Je pense que vous avez confondu la résistivité apparente rho_a qui est
-% unique pour chaque mesure donc fréquence, et qui vous donne une idée sur
-% la structure interne, avec les résistivités des couches rho_mod. rho_a a
-% donc une dimension 36*1 alors que rho_mod 21*1
-% % % % % % % %
-% NEW LINE : 
 rho_model = 1./exp(m_end);
 
 disp(['Lagrange parameter lambda = ',num2str(lambda),' chosen.'])
 
-
 % Forward model
-% % % % % % % %
-% même erreur que la dernière fois... ce qui sort de inversion_step c'est
-% log(sigma) donc ill faut que vous mettiez exp dans votre input à
-% Wait_recursion...
-% % % % % % % %
-% FAUX : [C_mod,rho_mod,phi_mod] = Wait_recursion(T,thick,1./m_end);
-% NEW LINE : 
 [C_forward,rho_a_forward,phi_forward] = Wait_recursion(T,thick,1./exp(m_end));
 
 disp('Forward model done.')
@@ -205,14 +192,8 @@ xLim = [min(T)*(1-padded) max(T)*(1+padded)];
 set(gcf,'Position',[100 100 800 500])
 % --- subplot 1 ---
 subplot(2,2,1) % C VS T
-% % % In this plot the objective if to see the results, so you use the C,
-% rhoa and phi calculated with the forward pb from the restulted model
-% FAUX : plot(T,re_c./1e3,'m','LineWidth',lw)
-% NEW LINE :
 plot(T,real(C_forward)./1e3,'m','LineWidth',lw)
 hold on
-% FAUX : plot(T,im_c./1e3,'g','LineWidth',lw)
-% NEW LINE :
 plot(T,imag(C_forward)./1e3,'g','LineWidth',lw)
 xlabel('T [s]','FontSize',fs)
 ylabel('C-response [km]','FontSize',fs)
@@ -222,9 +203,7 @@ grid on
 set(gca,'XScale','log');
 % --- subplot 3 ---
 subplot(2,2,3) % rho VS z
-% % % stairs(1./exp([m_end;m_end(end)]), z./1e3,'b','LineWidth',lw)
 stairs([rho_model(1); rho_model], [z]/1e3,'b','LineWidth',lw)
-% title(['Model: station ',num2str(stn),' ; \lambda = ',num2str(lambda)])
 xlabel('Modeled resistivity \rho [\Omega\cdotm]','FontSize',fs)
 ylabel('Depth z [km]','FontSize',fs)
 xlim([1 1e3])
@@ -234,10 +213,8 @@ grid on
 axis ij
 % --- subplot 2 ---
 subplot(2,2,2) % rho VS T
-% % % 
 loglog(T, rho_a_forward,'-b','LineWidth',lw)
 hold on
-% % % 
 loglog(T, rho_a,'or','LineWidth',lw)
 xlabel('T [s]','FontSize',fs)
 ylabel('Apparent resistivity \rho_a [\Omega\cdotm]','FontSize',fs)
@@ -248,7 +225,6 @@ grid on
 hold off
 % --- subplot 4 ---
 subplot(2,2,4) % phi VS T
-% % % 
 semilogx(T, phi_forward,'-b','LineWidth',lw)
 hold on
 semilogx(T, phi,'or','LineWidth',lw)
@@ -312,6 +288,188 @@ end
 
 disp('Figures printed.')
 disp('End.')
+
+
+
+%% Stock pour Figure ORAL
+
+% COMMENT 'clear' statement for this section to work
+
+% Rho_a = [];
+% Rho_a_fwd = [];
+% Rho_model = [];
+% Phi = [];
+% Phi_forward = [];
+
+
+Rho_a = [Rho_a,rho_a];
+Rho_a_forward = [Rho_a_fwd,rho_a_forward];
+Rho_model = [Rho_model,rho_model];
+Phi = [Phi,phi];
+Phi_forward = [Phi_forward,phi_forward];
+
+
+
+%% Figure ORAL
+
+fs = 15;
+lw = 1.0;
+splot = 0;
+
+rows = 3;
+cols = 4;
+
+xtext = 0.3;
+ytext = 0.5;
+
+figure(1),clf
+% sgtitle(['Station 90',num2str(stn),...
+%     ' : \chi^{2} = ',num2str(round(chi2,2)),...
+%     ' ; \lambda = ',num2str(round(lambda,2))],...
+%     'FontSize',fs+2)
+padded = 0.7;
+xLim = [min(T)*(1-padded) max(T)*(1+padded)];
+% set(gcf,'Position',[100 100 800 1300])
+
+splot = splot+1;
+subplot(rows,cols,splot)
+text(xtext,ytext,'Station 901','FontSize',fs);
+axis off
+
+
+
+% =======================
+% ===== Station 901 =====
+S = 1; 
+% --- subplot 1 ---
+splot = splot+1;
+subplot(rows,cols,splot) % rho VS z
+stairs([Rho_model(1,S); Rho_model(:,S)], z./1e3,'b','LineWidth',lw)
+xlabel('\rho [\Omega\cdotm]','FontSize',fs)
+ylabel('z [km]','FontSize',fs)
+xlim([1 1e3])
+ylim([0 10])
+set(gca,'XScale','log')
+grid on
+axis ij
+% --- subplot 2 ---
+splot = splot+1;
+subplot(rows,cols,splot) % rho VS T
+loglog(T, Rho_a_forward(:,S),'-b','LineWidth',lw)
+hold on
+loglog(T, Rho_a(:,S),'or','LineWidth',lw)
+xlabel('T [s]','FontSize',fs)
+ylabel('\rho_a [\Omega\cdotm]','FontSize',fs)
+legend('modeled', 'observed', 'Location', 'NorthEast')
+ylim([0 1e3])
+xlim(xLim)
+grid on
+hold off
+% --- subplot 3 ---
+splot = splot+1;
+subplot(rows,cols,splot) % phi VS T
+semilogx(T, Phi_forward(:,S),'-b','LineWidth',lw)
+hold on
+semilogx(T, Phi(:,S),'or','LineWidth',lw)
+xlabel('T [s]','FontSize',fs)
+ylabel('\phi [deg]','FontSize',fs)
+legend('modeled', 'observed', 'Location', 'SouthEast')
+ylim([-180 180])
+xlim(xLim)
+grid on
+hold off
+
+% =======================
+% ===== Station 902 =====
+splot = splot+1;
+subplot(rows,cols,splot)
+text(xtext,ytext,'Station 902','FontSize',fs);
+axis off
+S = 2; 
+% --- subplot 4 ---
+splot = splot+1;
+subplot(rows,cols,splot) % rho VS z
+stairs([Rho_model(1,S); Rho_model(:,S)], z./1e3,'b','LineWidth',lw)
+xlabel('\rho [\Omega\cdotm]','FontSize',fs)
+ylabel('z [km]','FontSize',fs)
+xlim([1 1e3])
+ylim([0 10])
+set(gca,'XScale','log')
+grid on
+axis ij
+% --- subplot 5 ---
+splot = splot+1;
+subplot(rows,cols,splot) % rho VS T
+loglog(T, Rho_a_forward(:,S),'-b','LineWidth',lw)
+hold on
+loglog(T, Rho_a(:,S),'or','LineWidth',lw)
+xlabel('T [s]','FontSize',fs)
+ylabel('\rho_a [\Omega\cdotm]','FontSize',fs)
+legend('modeled', 'observed', 'Location', 'NorthEast')
+ylim([0 1e3])
+xlim(xLim)
+grid on
+hold off
+% --- subplot 6 ---
+splot = splot+1;
+subplot(rows,cols,splot) % phi VS T
+semilogx(T, Phi_forward(:,S),'-b','LineWidth',lw)
+hold on
+semilogx(T, Phi(:,S),'or','LineWidth',lw)
+xlabel('T [s]','FontSize',fs)
+ylabel('\phi [deg]','FontSize',fs)
+legend('modeled', 'observed', 'Location', 'SouthEast')
+ylim([-180 180])
+xlim(xLim)
+grid on
+hold off
+
+% =======================
+% ===== Station 903 =====
+splot = splot+1;
+subplot(rows,cols,splot)
+text(xtext,ytext,'Station 903','FontSize',fs);
+axis off
+S = 3; 
+% --- subplot 7 ---
+splot = splot+1;
+subplot(rows,cols,splot) % rho VS z
+stairs([Rho_model(1,S); Rho_model(:,S)], z./1e3,'b','LineWidth',lw)
+xlabel('\rho [\Omega\cdotm]','FontSize',fs)
+ylabel('z [km]','FontSize',fs)
+xlim([1 1e3])
+ylim([0 10])
+set(gca,'XScale','log')
+grid on
+axis ij
+% --- subplot 8 ---
+splot = splot+1;
+subplot(rows,cols,splot) % rho VS T
+loglog(T, Rho_a_forward(:,S),'-b','LineWidth',lw)
+hold on
+loglog(T, Rho_a(:,S),'or','LineWidth',lw)
+xlabel('T [s]','FontSize',fs)
+ylabel('\rho_a [\Omega\cdotm]','FontSize',fs)
+legend('modeled', 'observed', 'Location', 'NorthEast')
+ylim([0 1e3])
+xlim(xLim)
+grid on
+hold off
+% --- subplot 9 ---
+splot = splot+1;
+subplot(rows,cols,splot) % phi VS T
+semilogx(T, Phi_forward(:,S),'-b','LineWidth',lw)
+hold on
+semilogx(T, Phi(:,S),'or','LineWidth',lw)
+xlabel('T [s]','FontSize',fs)
+ylabel('\phi [deg]','FontSize',fs)
+legend('modeled', 'observed', 'Location', 'SouthEast')
+ylim([-180 180])
+xlim(xLim)
+grid on
+hold off
+
+
 
 
 

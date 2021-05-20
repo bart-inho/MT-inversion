@@ -1,5 +1,11 @@
 % Magnetotelluric (MT) forward model
 % N-layered half-space
+% 
+% Camp de Geophysique d'Exploration
+% Projet 5: Magnetotellurique
+% Barthelemy Anhorn & Bruno Galissard de Marignac
+% 
+% First exercise
 
 clear
 
@@ -17,13 +23,12 @@ fs = 13; % Fontsize
 % Variables
 mu_0 = 4*pi*1e-7; % [H/m] magnetic permeability of free space
 
+
 [C,rho_a,phi] = Wait_recursion(T,thick,rho); % C-response [m]
     % rho_a = abs(C).^2*mu_0.*omega; % Apparent resistivity [Ohm.m]
     % phi = atand(imag(C)/real(C)) + 90; % Impedance phase [deg]
 
-% Regrouping data
-% data = [freq';rho_a';phi'];
-
+    
 figure
 loglog(T,rho_a,'.-')
 % plot(T, rho_a, '-o')

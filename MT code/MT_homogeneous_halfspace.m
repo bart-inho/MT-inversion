@@ -1,6 +1,13 @@
 % Magnetotelluric (MT)
 % Homogeneous half-space
-%
+% 
+% Camp de Geophysique d'Exploration
+% Projet 5: Magnetotellurique
+% Barthelemy Anhorn & Bruno Galissard de Marignac
+% 
+% Second exercise
+
+
 % Rows: relative to medium
 %       ocean, crust, upper mantle, lower mantle, core
 % Columns: relative to frequence
@@ -16,7 +23,7 @@ sigma = [3.2;1e-2;5e-3;5;5e5]; % [S/m] electrical conductivities
 q = 1i*mu_0*sigma*omega;
 skin = 1./(real(sqrt(q))); % [m] skin-depth
 
-E1 = 1; % ???
+E1 = 1; % 
 t = linspace(0,1e6,length(omega));
 
 E_0 = E_field(E1,omega,t,q,0);
@@ -31,7 +38,7 @@ ylabel('Skin depth [km]','FontSize',fs)
 title('MT homogeneous half-space','FontSize',fs)
 legend('ocean','crust','upper mantle','lower mantle','core','Location','best')
 
-figure(3),clf
+figure
 plot(E_0-E_skin,'.-')
 xlabel('Re(E_0-E_{skin})','FontSize',fs)
 ylabel('Im(E_0-E_{skin})','FontSize',fs)
@@ -41,8 +48,4 @@ grid on
 function [E] = E_field(E1,omega,t,q,z)
     E = E1*exp(1i*omega.*t-q.*z);
 end
-
-
-% Commentaires
-% Voila
 

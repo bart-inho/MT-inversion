@@ -1,5 +1,10 @@
 function [J] = jacobian_matrix(M,N,m,dm,T,d,y_m)
-
+%
+% Camp de Geophysique d'Exploration
+% Projet 5: Magnetotellurique
+% Bastien Ruols
+% modified by Barthelemy Anhorn & Bruno Galissard de Marignac
+% 
 %-----------------------------------------------------------------------
 % jacobian_matrix(N,m) computes the jacobian matrix needed for Occam's 1D
 %                      inversion of MT data

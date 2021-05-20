@@ -2,6 +2,10 @@ function [C,varargout] = Wait_recursion(T,thick,rho)
 % function [C] = Wait_recursion(omega,z,sigma)
 % Wait's recursion formula (2.33) from (Simpson & Bahr, 2005)
 %
+% Camp de Geophysique d'Exploration
+% Projet 5: Magnetotellurique
+% Barthelemy Anhorn & Bruno Galissard de Marignac
+%
 % Inputs:
 % - T: period [s]
 % - thick: thickness of layers [m]

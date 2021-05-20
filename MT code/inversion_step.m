@@ -1,5 +1,10 @@
 function [m_after, chi2] = inversion_step(C, T, d, m, M, N, dm, E, lambda, D)
-
+% 
+% Camp de Geophysique d'Exploration
+% Projet 5: Magnetotellurique
+% Bastien Ruols
+% modified by Barthelemy Anhorn & Bruno Galissard de Marignac
+% 
 %-----------------------------------------------------------------------
 % inversion_step(C, T, d, m, M, N, dm, E, lambda, D, step) gives you the
 % next iteration of the model as well as the data misfit chi2.
